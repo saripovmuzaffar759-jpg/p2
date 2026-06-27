@@ -1,0 +1,63 @@
+# ===== ЗАВИСИМОСТИ =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== БАЗЫ ДАННЫХ =====
+database.json
+*.db
+*.sqlite
+*.sqlite3
+*.json.backup
+backups/
+*.log
+
+# ===== СИСТЕМНЫЕ ФАЙЛЫ =====
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+
+# ===== IDE И РЕДАКТОРЫ =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.ropeproject/
+
+# ===== ОКРУЖЕНИЕ =====
+.env
+.env.local
+.env.*.local
+
+# ===== СТАРЫЕ ФАЙЛЫ =====
+db_*.json
+config.json
+users.json
+chat_history.json
+backup-*.json
+achievements.json
+banned.json
+chat_config.json
+
+# ===== ВРЕМЕННЫЕ ФАЙЛЫ =====
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# ===== СБОРКА =====
+dist/
+build/
+out/
+*.tgz
+
+# ===== ТЕСТЫ =====
+coverage/
+.nyc_output/
+
+# ===== ДРУГОЕ =====
+.vercel/
+.netlify/
