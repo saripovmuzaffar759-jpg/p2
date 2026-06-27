@@ -1,0 +1,14 @@
+# render.yaml - конфигурация для деплоя на Render.com
+services:
+  - type: web
+    name: superchat-ultra
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: PORT
+        value: 3000
+    autoDeploy: true
+    healthCheckPath: /
