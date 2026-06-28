@@ -37,7 +37,60 @@ class Database {
                 theme: 'dark',
                 skin: 'default'
             },
-            users: {},
+            users: {
+                // ПРЕДУСТАНОВЛЕННЫЕ ПОЛЬЗОВАТЕЛИ
+                'doros': {
+                    username: 'doros',
+                    displayName: 'Дорос',
+                    password: '123456',
+                    avatar: { emoji: '👑', color: '#FFD700', background: '#FFD70020' },
+                    status: 'online',
+                    bio: '👑 Администратор',
+                    balance: 1000,
+                    messages: 0,
+                    gifts: [],
+                    friends: [],
+                    chats: [],
+                    achievements: {},
+                    createdAt: new Date().toISOString(),
+                    lastSeen: new Date().toISOString(),
+                    role: 'admin'
+                },
+                'muz': {
+                    username: 'muz',
+                    displayName: 'Муза',
+                    password: '123456',
+                    avatar: { emoji: '🎵', color: '#FF6B6B', background: '#FF6B6B20' },
+                    status: 'online',
+                    bio: '🎵 Музыкальный админ',
+                    balance: 1000,
+                    messages: 0,
+                    gifts: [],
+                    friends: [],
+                    chats: [],
+                    achievements: {},
+                    createdAt: new Date().toISOString(),
+                    lastSeen: new Date().toISOString(),
+                    role: 'admin'
+                },
+                'admin': {
+                    username: 'admin',
+                    displayName: 'Admin',
+                    password: 'admin',
+                    avatar: { emoji: '⚡', color: '#FF4444', background: '#FF444420' },
+                    status: 'online',
+                    bio: '⚡ Главный администратор',
+                    balance: 9999,
+                    messages: 0,
+                    gifts: [],
+                    friends: [],
+                    chats: [],
+                    achievements: {},
+                    createdAt: new Date().toISOString(),
+                    lastSeen: new Date().toISOString(),
+                    role: 'admin'
+                }
+            },
             messages: {},
             chats: {},
             gifts: {
@@ -59,11 +112,19 @@ class Database {
             if (exists) {
                 const content = await fs.readFile(this.dataFile, 'utf8');
                 this.data = JSON.parse(content);
+                // Проверяем, есть ли предустановленные пользователи
+                const defaultUsers = this.defaultData().users;
+                for (const [key, val] of Object.entries(defaultUsers)) {
+                    if (!this.data.users[key]) {
+                        this.data.users[key] = val;
+                    }
+                }
+                await this.save();
                 console.log('✅ База данных загружена');
             } else {
                 this.data = this.defaultData();
                 await this.save();
-                console.log('📁 Создана новая БД');
+                console.log('📁 Создана новая БД с пользователями');
             }
         } catch (err) {
             console.error('❌ Ошибка:', err);
@@ -84,6 +145,7 @@ class Database {
             this.data.users[username] = {
                 username: username,
                 displayName: username,
+                password: '123456', // пароль по умолчанию
                 avatar: this.generateAvatar(username),
                 status: 'online',
                 bio: '',
@@ -94,7 +156,8 @@ class Database {
                 chats: [],
                 achievements: {},
                 createdAt: new Date().toISOString(),
-                lastSeen: new Date().toISOString()
+                lastSeen: new Date().toISOString(),
+                role: 'user'
             };
             this.save();
         }
@@ -212,6 +275,26 @@ class Database {
             gift: gift
         };
     }
+
+    // ===== АВТОРИЗАЦИЯ =====
+    login(username, password) {
+        const user = this.getUser(username);
+        if (user.password === password) {
+            return { success: true, user };
+        }
+        return { success: false, error: 'Неверный пароль' };
+    }
+
+    register(username, password) {
+        if (this.data.users[username]) {
+            return { success: false, error: 'Пользователь уже существует' };
+        }
+        const user = this.getUser(username);
+        user.password = password;
+        user.createdAt = new Date().toISOString();
+        this.save();
+        return { success: true, user };
+    }
 }
 
 // Ждем инициализации БД
@@ -226,33 +309,52 @@ async function startServer() {
         
         let currentUser = null;
 
-        socket.on('register', async (username) => {
-            console.log('📝 Регистрация:', username);
+        // ===== ЛОГИН =====
+        socket.on('login', (data) => {
+            const { username, password } = data;
+            const result = db.login(username, password);
             
-            const user = db.getUser(username);
-            currentUser = username;
+            if (result.success) {
+                const user = result.user;
+                currentUser = username;
+                
+                db.online.set(socket.id, { username, status: 'online' });
+                user.status = 'online';
+                user.lastSeen = new Date().toISOString();
+                db.save();
+
+                const userChats = user.chats || [];
+                const chats = userChats.map(id => db.getChat(id));
+
+                socket.emit('login_success', {
+                    username: username,
+                    user: user,
+                    chats: chats,
+                    gifts: db.data.gifts.available
+                });
+
+                io.emit('online_users', Array.from(db.online.values()).map(u => ({
+                    username: u.username,
+                    status: u.status || 'online'
+                })));
+
+                console.log(`✅ ${username} вошел в систему`);
+            } else {
+                socket.emit('login_error', result.error);
+            }
+        });
+
+        // ===== РЕГИСТРАЦИЯ =====
+        socket.on('register', (data) => {
+            const { username, password } = data;
+            const result = db.register(username, password);
             
-            db.online.set(socket.id, { username, status: 'online' });
-            user.status = 'online';
-            user.lastSeen = new Date().toISOString();
-            db.save();
-
-            const userChats = user.chats || [];
-            const chats = userChats.map(id => db.getChat(id));
-
-            socket.emit('login_success', {
-                username: username,
-                user: user,
-                chats: chats,
-                gifts: db.data.gifts.available
-            });
-
-            io.emit('online_users', Array.from(db.online.values()).map(u => ({
-                username: u.username,
-                status: u.status || 'online'
-            })));
-
-            console.log(`✅ ${username} вошел в систему`);
+            if (result.success) {
+                socket.emit('register_success', { username });
+                console.log(`📝 Зарегистрирован: ${username}`);
+            } else {
+                socket.emit('register_error', result.error);
+            }
         });
 
         socket.on('create_private_chat', (targetUser) => {
@@ -371,12 +473,27 @@ async function startServer() {
             });
         });
 
+        // ===== ПОИСК ПОЛЬЗОВАТЕЛЕЙ =====
         socket.on('search_users', (query) => {
             if (!currentUser || query.length < 2) return;
             
             const results = Object.keys(db.data.users)
-                .filter(u => u.toLowerCase().includes(query.toLowerCase()) && u !== currentUser)
-                .map(u => db.getUser(u));
+                .filter(u => {
+                    const user = db.data.users[u];
+                    return u.toLowerCase().includes(query.toLowerCase()) && 
+                           u !== currentUser &&
+                           (!user.hidden || user.hidden === false);
+                })
+                .map(u => {
+                    const user = db.data.users[u];
+                    return {
+                        username: u,
+                        displayName: user.displayName || u,
+                        avatar: user.avatar,
+                        status: user.status || 'offline',
+                        bio: user.bio || ''
+                    };
+                });
             
             socket.emit('search_results', results);
         });
@@ -422,10 +539,14 @@ async function startServer() {
 
     server.listen(PORT, '0.0.0.0', () => {
         console.log('\n' + '🚀'.repeat(30));
-        console.log('🌟 SUPERCHAT ULTRA v2.0 - МЕССЕНДЖЕР');
+        console.log('🌟 SUPERCHAT ULTRA v2.1 - С ПАРОЛЯМИ');
         console.log('🚀'.repeat(30));
         console.log(`📡 Порт: ${PORT}`);
         console.log(`👥 Пользователей: ${Object.keys(db.data.users).length}`);
+        console.log(`📝 Доступные логины:`);
+        for (const [key, val] of Object.entries(db.data.users)) {
+            console.log(`   👤 ${key} (${val.password})`);
+        }
         console.log(`💬 Чатов: ${Object.keys(db.data.chats).length}`);
         console.log(`🎁 Подарков: ${db.data.gifts.available.length}`);
         console.log('🚀'.repeat(30) + '\n');
