@@ -36,7 +36,6 @@
             overflow: hidden;
         }
 
-        /* ===== АНИМИРОВАННЫЙ ФОН ===== */
         body::before {
             content: '';
             position: fixed;
@@ -52,7 +51,6 @@
             pointer-events: none;
         }
 
-        /* ===== APP ===== */
         .app {
             position: relative;
             z-index: 1;
@@ -115,9 +113,10 @@
             height: 14px;
             border-radius: 50%;
             border: 2px solid var(--bg-secondary);
-            background: #4ade80;
-            box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
         }
+        .avatar .status-dot.online { background: #4ade80; box-shadow: 0 0 10px rgba(74,222,128,0.5); }
+        .avatar .status-dot.away { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,0.5); }
+        .avatar .status-dot.offline { background: #6b7280; }
 
         .user-name {
             font-weight: 700;
@@ -188,7 +187,7 @@
             background: var(--bg-card);
             border-radius: var(--radius);
             margin-top: 6px;
-            max-height: 220px;
+            max-height: 250px;
             overflow-y: auto;
             z-index: 100;
             border: 1px solid rgba(255,255,255,0.06);
@@ -237,6 +236,11 @@
             font-weight: 600;
         }
 
+        .search-result-item .result-online {
+            color: #4ade80;
+            font-size: 0.7rem;
+        }
+
         /* ===== СПИСОК ЧАТОВ ===== */
         .chats-list {
             flex: 1;
@@ -244,13 +248,8 @@
             padding: 8px 10px;
         }
 
-        .chats-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .chats-list::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 10px;
-        }
+        .chats-list::-webkit-scrollbar { width: 4px; }
+        .chats-list::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
         .chat-item {
             display: flex;
@@ -262,13 +261,8 @@
             transition: var(--transition);
             position: relative;
         }
-        .chat-item:hover {
-            background: rgba(255,255,255,0.04);
-        }
-        .chat-item.active {
-            background: rgba(124, 92, 252, 0.15);
-            border: 1px solid rgba(124, 92, 252, 0.2);
-        }
+        .chat-item:hover { background: rgba(255,255,255,0.04); }
+        .chat-item.active { background: rgba(124, 92, 252, 0.15); border: 1px solid rgba(124, 92, 252, 0.2); }
 
         .chat-item .avatar {
             width: 44px;
@@ -318,26 +312,15 @@
             color: var(--text-secondary);
         }
 
-        .empty-chat .big-icon {
-            font-size: 5rem;
-            animation: float 3s ease-in-out infinite;
-        }
+        .empty-chat .big-icon { font-size: 5rem; animation: float 3s ease-in-out infinite; }
 
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-15px); }
         }
 
-        .empty-chat .title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .empty-chat .sub {
-            font-size: 0.9rem;
-            opacity: 0.6;
-        }
+        .empty-chat .title { font-size: 1.4rem; font-weight: 700; color: #fff; }
+        .empty-chat .sub { font-size: 0.9rem; opacity: 0.6; }
 
         /* ===== ХЕДЕР ЧАТА ===== */
         .chat-header {
@@ -366,15 +349,8 @@
             background: var(--bg-input);
         }
 
-        .chat-header .chat-name {
-            font-size: 1.05rem;
-            font-weight: 700;
-        }
-
-        .chat-header .chat-members {
-            font-size: 0.75rem;
-            opacity: 0.5;
-        }
+        .chat-header .chat-name { font-size: 1.05rem; font-weight: 700; }
+        .chat-header .chat-members { font-size: 0.75rem; opacity: 0.5; }
 
         /* ===== СООБЩЕНИЯ ===== */
         .messages-container {
@@ -386,13 +362,8 @@
             gap: 4px;
         }
 
-        .messages-container::-webkit-scrollbar {
-            width: 4px;
-        }
-        .messages-container::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 10px;
-        }
+        .messages-container::-webkit-scrollbar { width: 4px; }
+        .messages-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
         .message {
             max-width: 70%;
@@ -548,12 +519,8 @@
             line-height: 1.5;
             transition: var(--transition);
         }
-        .input-area textarea:focus {
-            box-shadow: 0 0 0 2px var(--accent);
-        }
-        .input-area textarea::placeholder {
-            color: var(--text-secondary);
-        }
+        .input-area textarea:focus { box-shadow: 0 0 0 2px var(--accent); }
+        .input-area textarea::placeholder { color: var(--text-secondary); }
 
         .input-area .input-btn {
             width: 44px;
@@ -582,7 +549,7 @@
             box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
         }
 
-        /* ===== МОДАЛКА ===== */
+        /* ===== МОДАЛКА ВХОДА С ПАРОЛЕМ ===== */
         .modal {
             position: fixed;
             top: 0;
@@ -627,11 +594,35 @@
             background: var(--bg-input);
             color: #fff;
             font-size: 1rem;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             outline: none;
             transition: var(--transition);
         }
         .modal input:focus { box-shadow: 0 0 0 2px var(--accent); }
+
+        .modal .password-input {
+            position: relative;
+        }
+
+        .modal .password-input .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .modal .register-link {
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .modal .register-link:hover { opacity: 0.8; }
 
         .modal button {
             width: 100%;
@@ -646,6 +637,19 @@
             transition: var(--transition);
         }
         .modal button:hover { opacity: 0.9; transform: scale(1.02); }
+
+        .modal .error {
+            color: #ef4444;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            min-height: 20px;
+        }
+
+        .modal .success {
+            color: #4ade80;
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
 
         /* ===== ПАНЕЛЬ ПОДАРКОВ ===== */
         .gift-panel {
@@ -664,18 +668,8 @@
         }
         .gift-panel.show { display: block; }
 
-        .gift-panel .gift-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-
-        .gift-panel .gift-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-        }
+        .gift-panel .gift-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 12px; text-align: center; }
+        .gift-panel .gift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 
         .gift-panel .gift-item {
             background: var(--bg-input);
@@ -734,14 +728,8 @@
             text-align: center;
         }
 
-        .profile-modal .profile-stat .num {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-        .profile-modal .profile-stat .label {
-            font-size: 0.6rem;
-            opacity: 0.5;
-        }
+        .profile-modal .profile-stat .num { font-size: 1.3rem; font-weight: 700; }
+        .profile-modal .profile-stat .label { font-size: 0.6rem; opacity: 0.5; }
 
         /* ===== АДАПТИВ ===== */
         @media (max-width: 768px) {
@@ -785,15 +773,49 @@
     </style>
 </head>
 <body>
-    <!-- ===== МОДАЛКА ВХОДА ===== -->
+    <!-- ===== МОДАЛКА ВХОДА С ПАРОЛЕМ ===== -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
-            <div class="modal-icon">🚀</div>
+            <div class="modal-icon">🔐</div>
             <div class="modal-title">SuperChat Ultra</div>
-            <div class="modal-sub">Войди или зарегистрируйся</div>
-            <input type="text" id="usernameInput" placeholder="Введите никнейм" maxlength="20" autofocus />
-            <button id="loginBtn">✨ Войти</button>
-            <div style="color: #ef4444; margin-top: 12px; font-size: 0.85rem;" id="loginError"></div>
+            <div class="modal-sub" id="authSub">Введите логин и пароль</div>
+            
+            <input type="text" id="loginUsername" placeholder="👤 Логин" maxlength="20" autofocus />
+            
+            <div class="password-input">
+                <input type="password" id="loginPassword" placeholder="🔑 Пароль" maxlength="30" />
+                <button class="toggle-password" onclick="togglePassword()">👁️</button>
+            </div>
+            
+            <button id="loginBtn">🚀 Войти</button>
+            
+            <div style="margin-top:12px; font-size:0.85rem; opacity:0.6;">
+                Нет аккаунта? <span class="register-link" onclick="showRegister()">Зарегистрироваться</span>
+            </div>
+            
+            <div class="error" id="loginError"></div>
+            <div class="success" id="loginSuccess"></div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА РЕГИСТРАЦИИ ===== -->
+    <div class="modal hidden" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-icon">📝</div>
+            <div class="modal-title">Регистрация</div>
+            <div class="modal-sub">Создай свой аккаунт</div>
+            
+            <input type="text" id="registerUsername" placeholder="👤 Логин" maxlength="20" />
+            <input type="password" id="registerPassword" placeholder="🔑 Пароль" maxlength="30" />
+            <input type="password" id="registerPassword2" placeholder="🔑 Повторите пароль" maxlength="30" />
+            
+            <button onclick="registerUser()">✅ Зарегистрироваться</button>
+            
+            <div style="margin-top:12px; font-size:0.85rem; opacity:0.6;">
+                Уже есть аккаунт? <span class="register-link" onclick="showLogin()">Войти</span>
+            </div>
+            
+            <div class="error" id="registerError"></div>
         </div>
     </div>
 
@@ -808,7 +830,7 @@
                 <div class="user-profile" onclick="showProfile()">
                     <div class="avatar" id="userAvatar">
                         <span id="avatarEmoji">😊</span>
-                        <span class="status-dot" id="statusDot"></span>
+                        <span class="status-dot online" id="statusDot"></span>
                     </div>
                     <div>
                         <div class="user-name" id="userName">Загрузка...</div>
@@ -911,12 +933,21 @@
         let replyTo = null;
         let userData = null;
         let allChats = [];
+        let usersDB = {};
 
         // ========== DOM ==========
         const loginModal = document.getElementById('loginModal');
-        const usernameInput = document.getElementById('usernameInput');
+        const registerModal = document.getElementById('registerModal');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
         const loginBtn = document.getElementById('loginBtn');
         const loginError = document.getElementById('loginError');
+        const loginSuccess = document.getElementById('loginSuccess');
+        const registerUsername = document.getElementById('registerUsername');
+        const registerPassword = document.getElementById('registerPassword');
+        const registerPassword2 = document.getElementById('registerPassword2');
+        const registerError = document.getElementById('registerError');
+        const authSub = document.getElementById('authSub');
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
         const chatsList = document.getElementById('chatsList');
@@ -939,7 +970,109 @@
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
 
-        // ========== СОКЕТЫ ==========
+        // ========== ЛОКАЛЬНЫЕ ПОЛЬЗОВАТЕЛИ (временно) ==========
+        // В реальном проекте это хранится в БД на сервере
+        const LOCAL_USERS = {
+            'doros': { password: '123456', displayName: 'Дорос', avatar: '👑' },
+            'muz': { password: '123456', displayName: 'Муза', avatar: '🎵' },
+            'admin': { password: 'admin', displayName: 'Admin', avatar: '⚡' }
+        };
+
+        // ========== АВТОРИЗАЦИЯ ==========
+        function showRegister() {
+            loginModal.classList.add('hidden');
+            registerModal.classList.remove('hidden');
+            registerError.textContent = '';
+        }
+
+        function showLogin() {
+            registerModal.classList.add('hidden');
+            loginModal.classList.remove('hidden');
+            loginError.textContent = '';
+            loginSuccess.textContent = '';
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('loginPassword');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // ===== ВХОД =====
+        loginBtn.addEventListener('click', () => {
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value.trim();
+
+            if (!username || !password) {
+                loginError.textContent = '❌ Заполните все поля';
+                return;
+            }
+
+            // Проверка локальных пользователей
+            if (LOCAL_USERS[username]) {
+                if (LOCAL_USERS[username].password === password) {
+                    loginError.textContent = '';
+                    loginSuccess.textContent = '✅ Вход выполнен!';
+                    setTimeout(() => {
+                        socket.emit('register', username);
+                    }, 500);
+                    return;
+                } else {
+                    loginError.textContent = '❌ Неверный пароль';
+                    return;
+                }
+            }
+
+            // Отправка на сервер для проверки
+            socket.emit('login', { username, password });
+        });
+
+        // ===== РЕГИСТРАЦИЯ =====
+        function registerUser() {
+            const username = registerUsername.value.trim();
+            const password = registerPassword.value.trim();
+            const password2 = registerPassword2.value.trim();
+
+            if (!username || !password || !password2) {
+                registerError.textContent = '❌ Заполните все поля';
+                return;
+            }
+
+            if (password.length < 4) {
+                registerError.textContent = '❌ Пароль минимум 4 символа';
+                return;
+            }
+
+            if (password !== password2) {
+                registerError.textContent = '❌ Пароли не совпадают';
+                return;
+            }
+
+            if (LOCAL_USERS[username]) {
+                registerError.textContent = '❌ Пользователь уже существует';
+                return;
+            }
+
+            // Регистрация на сервере
+            socket.emit('register', { username, password });
+            
+            // Временно добавляем локально
+            LOCAL_USERS[username] = { password, displayName: username, avatar: '👤' };
+            
+            registerError.textContent = '';
+            registerError.style.color = '#4ade80';
+            registerError.textContent = '✅ Регистрация успешна! Войдите в систему.';
+            
+            setTimeout(() => {
+                registerModal.classList.add('hidden');
+                loginModal.classList.remove('hidden');
+                loginUsername.value = username;
+                loginPassword.value = '';
+                loginError.textContent = '';
+                loginSuccess.textContent = '✅ Аккаунт создан! Войдите.';
+            }, 1500);
+        }
+
+        // ===== ОБРАБОТЧИКИ СОКЕТОВ =====
         socket.on('login_success', (data) => {
             console.log('✅ Вход:', data.username);
             currentUser = data.username;
@@ -947,11 +1080,17 @@
             allChats = data.chats || [];
             
             loginModal.classList.add('hidden');
+            registerModal.classList.add('hidden');
             updateProfileUI();
             renderChats();
             updateGifts();
             
             if (allChats.length > 0) openChat(allChats[0].id);
+            showNotification(`👋 Добро пожаловать, ${currentUser}!`);
+        });
+
+        socket.on('login_error', (msg) => {
+            loginError.textContent = '❌ ' + msg;
         });
 
         socket.on('chat_created', ({ chatId, chat }) => {
@@ -1012,40 +1151,34 @@
             `).join('');
         });
 
+        // ===== ПОИСК =====
         socket.on('search_results', (results) => {
-            if (!results.length) {
+            console.log('🔍 Результаты поиска:', results);
+            if (!results || !results.length) {
                 searchResults.innerHTML = '<div style="padding:12px;color:var(--text-secondary);text-align:center;">Никого не найдено</div>';
                 searchResults.classList.add('show');
                 return;
             }
-            searchResults.innerHTML = results.map(u => `
-                <div class="search-result-item" onclick="startChat('${u.username}')">
-                    <div class="result-avatar">${u.avatar?.emoji || '👤'}</div>
-                    <div>
-                        <div class="result-name">${u.username}</div>
-                        <div class="result-status">${u.status === 'online' ? '🟢 Онлайн' : '⚪ Не в сети'}</div>
+
+            searchResults.innerHTML = results.map(u => {
+                const avatar = u.avatar?.emoji || '👤';
+                const statusClass = u.status === 'online' ? '🟢' : '⚪';
+                const statusText = u.status === 'online' ? 'Онлайн' : 'Не в сети';
+                return `
+                    <div class="search-result-item" onclick="startChat('${u.username}')">
+                        <div class="result-avatar">${avatar}</div>
+                        <div>
+                            <div class="result-name">${u.username}</div>
+                            <div class="result-status">${statusClass} ${statusText}</div>
+                        </div>
+                        <div class="result-action">Написать</div>
                     </div>
-                    <div class="result-action">Написать</div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             searchResults.classList.add('show');
         });
 
-        // ===== ВХОД =====
-        loginBtn.addEventListener('click', () => {
-            const username = usernameInput.value.trim();
-            if (username) {
-                socket.emit('register', username);
-            } else {
-                loginError.textContent = '❌ Введите никнейм';
-            }
-        });
-
-        usernameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') loginBtn.click();
-        });
-
-        // ===== ПОИСК =====
+        // ===== ПОИСК ПОЛЬЗОВАТЕЛЕЙ =====
         function searchUsers(query) {
             if (!query || query.length < 2) {
                 searchResults.classList.remove('show');
@@ -1353,9 +1486,20 @@
             }
         });
 
+        // ===== ВХОД ПО ENTER =====
+        loginPassword.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginBtn.click();
+        });
+
+        loginUsername.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginPassword.focus();
+        });
+
         // ===== СТАРТ =====
-        window.onload = () => usernameInput.focus();
-        console.log('🚀 SuperChat Ultra v2.0');
+        window.onload = () => {
+            loginUsername.focus();
+            console.log('🚀 SuperChat Ultra v2.1 с паролями');
+        };
     </script>
 </body>
 </html>
