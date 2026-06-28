@@ -236,11 +236,6 @@
             font-weight: 600;
         }
 
-        .search-result-item .result-online {
-            color: #4ade80;
-            font-size: 0.7rem;
-        }
-
         /* ===== СПИСОК ЧАТОВ ===== */
         .chats-list {
             flex: 1;
@@ -806,7 +801,7 @@
             <div class="modal-sub">Создай свой аккаунт</div>
             
             <input type="text" id="registerUsername" placeholder="👤 Логин" maxlength="20" />
-            <input type="password" id="registerPassword" placeholder="🔑 Пароль" maxlength="30" />
+            <input type="password" id="registerPassword" placeholder="🔑 Пароль (мин. 4 символа)" maxlength="30" />
             <input type="password" id="registerPassword2" placeholder="🔑 Повторите пароль" maxlength="30" />
             
             <button onclick="registerUser()">✅ Зарегистрироваться</button>
@@ -933,7 +928,6 @@
         let replyTo = null;
         let userData = null;
         let allChats = [];
-        let usersDB = {};
 
         // ========== DOM ==========
         const loginModal = document.getElementById('loginModal');
@@ -947,7 +941,6 @@
         const registerPassword = document.getElementById('registerPassword');
         const registerPassword2 = document.getElementById('registerPassword2');
         const registerError = document.getElementById('registerError');
-        const authSub = document.getElementById('authSub');
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
         const chatsList = document.getElementById('chatsList');
@@ -970,19 +963,12 @@
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
 
-        // ========== ЛОКАЛЬНЫЕ ПОЛЬЗОВАТЕЛИ (временно) ==========
-        // В реальном проекте это хранится в БД на сервере
-        const LOCAL_USERS = {
-            'doros': { password: '123456', displayName: 'Дорос', avatar: '👑' },
-            'muz': { password: '123456', displayName: 'Муза', avatar: '🎵' },
-            'admin': { password: 'admin', displayName: 'Admin', avatar: '⚡' }
-        };
-
         // ========== АВТОРИЗАЦИЯ ==========
         function showRegister() {
             loginModal.classList.add('hidden');
             registerModal.classList.remove('hidden');
             registerError.textContent = '';
+            registerError.style.color = '#ef4444';
         }
 
         function showLogin() {
@@ -1007,22 +993,9 @@
                 return;
             }
 
-            // Проверка локальных пользователей
-            if (LOCAL_USERS[username]) {
-                if (LOCAL_USERS[username].password === password) {
-                    loginError.textContent = '';
-                    loginSuccess.textContent = '✅ Вход выполнен!';
-                    setTimeout(() => {
-                        socket.emit('register', username);
-                    }, 500);
-                    return;
-                } else {
-                    loginError.textContent = '❌ Неверный пароль';
-                    return;
-                }
-            }
-
-            // Отправка на сервер для проверки
+            loginError.textContent = '';
+            loginSuccess.textContent = '⏳ Подключение...';
+            
             socket.emit('login', { username, password });
         });
 
@@ -1034,45 +1007,30 @@
 
             if (!username || !password || !password2) {
                 registerError.textContent = '❌ Заполните все поля';
+                registerError.style.color = '#ef4444';
                 return;
             }
 
             if (password.length < 4) {
                 registerError.textContent = '❌ Пароль минимум 4 символа';
+                registerError.style.color = '#ef4444';
                 return;
             }
 
             if (password !== password2) {
                 registerError.textContent = '❌ Пароли не совпадают';
+                registerError.style.color = '#ef4444';
                 return;
             }
 
-            if (LOCAL_USERS[username]) {
-                registerError.textContent = '❌ Пользователь уже существует';
-                return;
-            }
-
-            // Регистрация на сервере
-            socket.emit('register', { username, password });
-            
-            // Временно добавляем локально
-            LOCAL_USERS[username] = { password, displayName: username, avatar: '👤' };
-            
             registerError.textContent = '';
             registerError.style.color = '#4ade80';
-            registerError.textContent = '✅ Регистрация успешна! Войдите в систему.';
+            registerError.textContent = '⏳ Регистрация...';
             
-            setTimeout(() => {
-                registerModal.classList.add('hidden');
-                loginModal.classList.remove('hidden');
-                loginUsername.value = username;
-                loginPassword.value = '';
-                loginError.textContent = '';
-                loginSuccess.textContent = '✅ Аккаунт создан! Войдите.';
-            }, 1500);
+            socket.emit('register', { username, password });
         }
 
-        // ===== ОБРАБОТЧИКИ СОКЕТОВ =====
+        // ===== СОКЕТЫ =====
         socket.on('login_success', (data) => {
             console.log('✅ Вход:', data.username);
             currentUser = data.username;
@@ -1085,12 +1043,35 @@
             renderChats();
             updateGifts();
             
-            if (allChats.length > 0) openChat(allChats[0].id);
+            if (allChats.length > 0) {
+                openChat(allChats[0].id);
+            }
             showNotification(`👋 Добро пожаловать, ${currentUser}!`);
         });
 
         socket.on('login_error', (msg) => {
             loginError.textContent = '❌ ' + msg;
+            loginSuccess.textContent = '';
+        });
+
+        socket.on('register_success', (data) => {
+            registerError.textContent = '';
+            registerError.style.color = '#4ade80';
+            registerError.textContent = '✅ Регистрация успешна! Войдите в систему.';
+            
+            setTimeout(() => {
+                registerModal.classList.add('hidden');
+                loginModal.classList.remove('hidden');
+                loginUsername.value = data.username;
+                loginPassword.value = '';
+                loginError.textContent = '';
+                loginSuccess.textContent = '✅ Аккаунт создан! Войдите.';
+            }, 1500);
+        });
+
+        socket.on('register_error', (msg) => {
+            registerError.textContent = '❌ ' + msg;
+            registerError.style.color = '#ef4444';
         });
 
         socket.on('chat_created', ({ chatId, chat }) => {
@@ -1153,23 +1134,23 @@
 
         // ===== ПОИСК =====
         socket.on('search_results', (results) => {
-            console.log('🔍 Результаты поиска:', results);
+            console.log('🔍 Найдено пользователей:', results.length);
+            
             if (!results || !results.length) {
-                searchResults.innerHTML = '<div style="padding:12px;color:var(--text-secondary);text-align:center;">Никого не найдено</div>';
+                searchResults.innerHTML = '<div style="padding:12px;color:var(--text-secondary);text-align:center;">🔍 Никого не найдено</div>';
                 searchResults.classList.add('show');
                 return;
             }
 
             searchResults.innerHTML = results.map(u => {
                 const avatar = u.avatar?.emoji || '👤';
-                const statusClass = u.status === 'online' ? '🟢' : '⚪';
-                const statusText = u.status === 'online' ? 'Онлайн' : 'Не в сети';
+                const statusText = u.status === 'online' ? '🟢 Онлайн' : '⚪ Не в сети';
                 return `
                     <div class="search-result-item" onclick="startChat('${u.username}')">
                         <div class="result-avatar">${avatar}</div>
                         <div>
-                            <div class="result-name">${u.username}</div>
-                            <div class="result-status">${statusClass} ${statusText}</div>
+                            <div class="result-name">${u.displayName || u.username}</div>
+                            <div class="result-status">${statusText}</div>
                         </div>
                         <div class="result-action">Написать</div>
                     </div>
@@ -1194,9 +1175,14 @@
                 return;
             }
 
+            // Проверяем существующий чат
             const existing = allChats.find(c => 
-                c.type === 'private' && c.members?.includes(username) && c.members?.includes(currentUser)
+                c.type === 'private' && 
+                c.members && 
+                c.members.includes(username) && 
+                c.members.includes(currentUser)
             );
+            
             if (existing) {
                 openChat(existing.id);
                 searchResults.classList.remove('show');
@@ -1499,6 +1485,8 @@
         window.onload = () => {
             loginUsername.focus();
             console.log('🚀 SuperChat Ultra v2.1 с паролями');
+            console.log('📝 Доступные логины: doros, muz, admin');
+            console.log('🔑 Пароль: 123456 (admin: admin)');
         };
     </script>
 </body>
